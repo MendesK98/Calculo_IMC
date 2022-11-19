@@ -23,7 +23,7 @@ public class User {
         this.imc = peso / (altura * altura);
     }
 
-    //Gerando mensangem para o usuário baseado no IMC
+    //Gerando mensangem para o usuário baseado no IMC calculado
     public String imcMessage () {
         String imcDefinicao = "";
         if (this.imc > 0 && this.imc <= 18.5) {
