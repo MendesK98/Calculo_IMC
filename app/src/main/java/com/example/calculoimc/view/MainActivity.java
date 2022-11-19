@@ -1,4 +1,4 @@
-package com.example.calculoimc;
+package com.example.calculoimc.view;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -6,6 +6,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+
+import com.example.calculoimc.R;
+import com.example.calculoimc.view.ReceberDados;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -16,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
 
         Button calcular = (Button) findViewById(R.id.bCalcular);
 
-        Intent i = new Intent(this, Calcular.class);
+        Intent i = new Intent(this, ReceberDados.class);
         calcular.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
