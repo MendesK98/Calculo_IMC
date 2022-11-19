@@ -19,10 +19,11 @@ public class Resultados extends AppCompatActivity {
         setContentView(R.layout.activity_resultados);
 
         TextView show = (TextView) findViewById(R.id.tResultado);
+        TextView show2 = (TextView) findViewById(R.id.tMensagem);
 
         //Criando usuario;
         User user = new User();
-        String imcDefinicao ;
+        String imcDefinicao ="Isso significa que ";
 
         //Recebendo dados via Intent
         Intent b = getIntent();
@@ -37,11 +38,11 @@ public class Resultados extends AppCompatActivity {
 
         //Apresentando resultados
         String resultado = "Sua Idade: " + user.getIdade() + "\nSeu Peso: " + user.getPeso() + "\nSua Altura: " + user.getAltura()
-                + "\n\nSeu índice de massa corporal eh: " + formatador.format(user.getImc()) + " e isso significa que ";
+                + "\n\nSeu índice de massa corporal eh: " + formatador.format(user.getImc()) + "\nO Indíce recomendado eh entre 18,5 e 25";
 
-        resultado += user.imcMessage();
+        imcDefinicao += user.imcMessage();
 
-
+        show2.setText(imcDefinicao);
         show.setText(resultado);
     }
 }

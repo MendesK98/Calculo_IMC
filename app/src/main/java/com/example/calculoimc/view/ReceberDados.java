@@ -39,7 +39,7 @@ public class ReceberDados extends AppCompatActivity {
 
                 MetodosGerais mtg = new MetodosGerais();
 
-                Integer iIdade = Integer.parseInt(idade.getText().toString());
+                Integer iIdade = Integer.parseInt(idade.getText().toString().trim());
                 Double dPeso = mtg.ConverStringToDouble(sPeso);
                 Double dAltura = mtg.ConverStringToDouble(sAltura);
 
