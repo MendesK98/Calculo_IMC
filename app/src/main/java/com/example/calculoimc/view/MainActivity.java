@@ -8,9 +8,10 @@ import android.view.View;
 import android.widget.Button;
 
 import com.example.calculoimc.R;
-import com.example.calculoimc.view.ReceberDados;
 
 public class MainActivity extends AppCompatActivity {
+
+    String TAG = "erro";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +29,8 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+
 
     }
 }

@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.calculoimc.R;
@@ -20,6 +22,8 @@ public class Resultados extends AppCompatActivity {
 
         TextView show = (TextView) findViewById(R.id.tResultado);
         TextView show2 = (TextView) findViewById(R.id.tMensagem);
+        Button save = (Button) findViewById(R.id.save);
+        Button historico = (Button) findViewById(R.id.historico);
 
         //Criando usuario;
         User user = new User();
@@ -44,5 +48,26 @@ public class Resultados extends AppCompatActivity {
 
         show2.setText(imcDefinicao);
         show.setText(resultado);
+
+        //Evento botao para adicionar IMC na lista de IMCs
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                user.adicionarIMC();
+            }
+        });
+        Intent hist = new Intent(this, Historic.class);
+        //Evento botao para visualizar a lista de IMCs
+
+        //FALTA: Iniciar atividade Historico e exibir lista de IMCs calculados
+        historico.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(hist);
+                finish();
+            }
+        });
+
+
     }
 }

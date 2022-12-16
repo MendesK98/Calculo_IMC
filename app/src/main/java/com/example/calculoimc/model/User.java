@@ -1,26 +1,47 @@
 package com.example.calculoimc.model;
 
-import java.text.DecimalFormat;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-public class User {
+public class User implements Serializable {
     String nome;
-    int idade;
-    double altura;
-    double peso;
-    double imc;
+    private int id;
+    private int idade;
+    private double altura;
+    private double peso;
+    private double imc;
+
+    private List<Double> imcs = new ArrayList<>();
 
     //Métodos construtores
     public User() {};
 
-    User (double altura, double peso) {
-        this.altura = altura;
-        this.peso = peso;
+
+    public User (int id) {
+        this.id = id;
+    }
+
+    public User (String nome) {
+        this.nome = nome;
+    }
+
+   public  User (int id, String nome, String email) {
+        this.id = id;
+        this.nome = nome;
     }
 
 
     //Método para cálculo do indice de massa corporal
     public void calcIMC (double altura, double peso) {
         this.imc = peso / (altura * altura);
+    }
+
+    //Salvar IMC na lista
+    public void adicionarIMC () {
+        if (this.imc > 0 && this.imc <= 80) {
+            imcs.add(this.imc);
+        }
     }
 
     //Gerando mensangem para o usuário baseado no IMC calculado
@@ -36,7 +57,7 @@ public class User {
             imcDefinicao += "seu estado atual é de obesidade grau I, recomenda-se procurar um profissional de saúde/nutrição";
         } else if (this.imc >= 35 && this.imc < 40) {
             imcDefinicao += "seu estado atual é de obesidade grau II, recomenda-se procurar um profissional de saúde/nutrição";
-        } else if (this.imc > 40 && this.imc < 80) {
+        } else if (this.imc > 40 && this.imc <= 80) {
             imcDefinicao += "seu estado atual é obesidade grau III, recomenda-se procurar um profissional de saúde/nutrição";
         } else {
             imcDefinicao = "Valores NÃO inseridos corretamente, reinicie o app e tente novamente!!!";
@@ -84,5 +105,21 @@ public class User {
 
     public void setImc(double imc) {
         this.imc = imc;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public List<Double> getImcs() {
+        return imcs;
+    }
+
+    public void setImcs(List<Double> imcs) {
+        this.imcs = imcs;
     }
 }
