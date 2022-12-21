@@ -19,13 +19,11 @@ public class ReceberDados extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.receber_dados);
 
-        TextInputEditText idade = (TextInputEditText) findViewById(R.id.tIdade);
         TextInputEditText peso = (TextInputEditText) findViewById(R.id.tPeso);
         TextInputEditText altura = (TextInputEditText) findViewById(R.id.tAltura);
 
         peso.setRawInputType(Configuration.KEYBOARD_12KEY);
         altura.setRawInputType(Configuration.KEYBOARD_12KEY);
-        idade.setRawInputType(Configuration.KEYBOARD_12KEY);
 
         Intent a = new Intent (this, Resultados.class);
         Button calcular = (Button) findViewById(R.id.btCalcular);
@@ -39,11 +37,9 @@ public class ReceberDados extends AppCompatActivity {
 
                 MetodosGerais mtg = new MetodosGerais();
 
-                Integer iIdade = Integer.parseInt(idade.getText().toString().trim());
                 Double dPeso = mtg.ConverStringToDouble(sPeso);
                 Double dAltura = mtg.ConverStringToDouble(sAltura);
 
-                a.putExtra("idade", iIdade);
                 a.putExtra("peso", dPeso);
                 a.putExtra("altura", dAltura);
 

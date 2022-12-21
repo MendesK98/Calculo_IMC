@@ -7,6 +7,7 @@ public class MetodosGerais {
         if (x.contains(",")) {
             x = x.replace(",", ".");
         }
+
         Double y = Double.parseDouble(x);
         return y;
     }
