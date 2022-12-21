@@ -59,6 +59,14 @@ public class Resultados extends AppCompatActivity {
             }
         });
 
+        //Parei aqui, criar método para salvar o imc na lista de imcs de cada usuario, precisa criar loginc com usuarios e modo de entrada anonimo
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                User user = new User();
+                user.adicionarIMC(imc);
+            }
+        });
 
     }
 }

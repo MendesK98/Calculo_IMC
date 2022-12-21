@@ -12,6 +12,7 @@ public class IMC {
         this.peso = peso;
     }
 
+
     //Método para cálculo do indice de massa corporal
     public double calcIMC () {
         return this.indice = (this.peso / (this.altura * this.altura));
