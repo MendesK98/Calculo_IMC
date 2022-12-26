@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.example.calculoimc.R;
 import com.example.calculoimc.model.IMC;
 import com.example.calculoimc.model.User;
+import com.example.calculoimc.model.Usuarios;
 
 import java.text.DecimalFormat;
 
@@ -63,8 +64,31 @@ public class Resultados extends AppCompatActivity {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                User user = new User();
-                user.adicionarIMC(imc);
+                User lucas = new User("Lucas");
+                User ana = new User("Ana");
+                User maria = new User("Maria");
+
+                IMC x = new IMC();
+                x.setIndice(25.3);
+                x.setAltura(1.7);
+                x.setPeso(60.7);
+                IMC x2 = new IMC();
+                x2.setIndice(25.3);
+                x2.setAltura(1.7);
+                x2.setPeso(60.7);
+                IMC x3 = new IMC();
+                x3.setIndice(25.3);
+                x3.setAltura(1.7);
+                x3.setPeso(60.7);
+
+                lucas.setImc(x);
+                ana.setImc(x2);
+                maria.setImc(x3);
+
+                Usuarios.addUser(lucas);
+                Usuarios.addUser(ana);
+                Usuarios.addUser(maria);
+
             }
         });
 

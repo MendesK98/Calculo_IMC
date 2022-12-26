@@ -12,12 +12,10 @@ public class User implements Serializable {
     private double peso;
     private IMC imc = new IMC();
 
-
     private ArrayList<IMC> imcs = new ArrayList<>();
 
     //Métodos construtores
     public User() {};
-
 
     public User (int id) {
         this.id = id;
@@ -31,9 +29,6 @@ public class User implements Serializable {
         this.id = id;
         this.nome = nome;
     }
-
-
-
 
     //Salvar IMC na lista
     public void adicionarIMC (IMC x) {
