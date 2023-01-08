@@ -5,14 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class User implements Serializable {
-    String nome;
+    private String nome;
     private int id;
     private int idade;
     private double altura;
     private double peso;
     private IMC imc = new IMC();
 
-    private ArrayList<IMC> imcs = new ArrayList<>();
 
     //Métodos construtores
     public User() {};
@@ -30,14 +29,7 @@ public class User implements Serializable {
         this.nome = nome;
     }
 
-    //Salvar IMC na lista
-    public void adicionarIMC (IMC x) {
-        imcs.add(x);
-    }
-
-
     //Getters and Setters
-
     public String getNome() {
         return nome;
     }
@@ -48,10 +40,6 @@ public class User implements Serializable {
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public int getIdade() {
@@ -86,11 +74,4 @@ public class User implements Serializable {
         this.imc = imc;
     }
 
-    public List<IMC> getImcs() {
-        return imcs;
-    }
-
-    public void setImcs(ArrayList<IMC> imcs) {
-        this.imcs = imcs;
-    }
 }

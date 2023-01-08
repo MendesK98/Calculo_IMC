@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.example.calculoimc.R;
+import com.example.calculoimc.database.DataBase;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -17,6 +18,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //DB
+        DataBase dataBase = new DataBase(this);
+
 
         Button calcular = (Button) findViewById(R.id.bCalcular);
 
@@ -28,8 +33,5 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
         });
-
-
-
     }
 }
