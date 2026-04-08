@@ -53,16 +53,13 @@ public class ReceberDados extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(android.view.MenuItem item) {
-        // Verifica se o clique foi na setinha de voltar (id padrão do Android)
         if (item.getItemId() == android.R.id.home) {
-            // Cria a intenção de ir para a MainActivity
             android.content.Intent intent = new android.content.Intent(this, com.example.calculoimc.view.MainActivity.class);
 
-            // Limpa as telas que ficaram no caminho e volta para a principal
             intent.addFlags(android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP | android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
             startActivity(intent);
-            finish(); // Fecha a tela de resultados
+            finish();
             return true;
         }
         return super.onOptionsItemSelected(item);

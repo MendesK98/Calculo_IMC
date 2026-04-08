@@ -37,4 +37,18 @@ public class Historic extends AppCompatActivity {
         listView.setAdapter(adapter);
         }
 
+    @Override
+    public boolean onOptionsItemSelected(android.view.MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            android.content.Intent intent = new android.content.Intent(this, com.example.calculoimc.view.MainActivity.class);
+
+            intent.addFlags(android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP | android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+            startActivity(intent);
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 }
