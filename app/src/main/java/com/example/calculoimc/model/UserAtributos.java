@@ -1,30 +1,24 @@
 package com.example.calculoimc.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
-public class User implements Serializable {
-    private String nome;
+public class UserAtributos implements Serializable {
     private int id;
+    private String nome;
     private int idade;
-    private double altura;
-    private double peso;
     private IMC imc = new IMC();
-
-
     //Métodos construtores
-    public User() {};
+    public UserAtributos() {};
 
-    public User (int id) {
+    public UserAtributos(int id) {
         this.id = id;
     }
 
-    public User (String nome) {
+    public UserAtributos(String nome) {
         this.nome = nome;
     }
 
-   public  User (int id, String nome, String email) {
+   public UserAtributos(int id, String nome, String email) {
         this.id = id;
         this.nome = nome;
     }
@@ -50,22 +44,6 @@ public class User implements Serializable {
         this.idade = idade;
     }
 
-    public double getAltura() {
-        return altura;
-    }
-
-    public void setAltura(double altura) {
-        this.altura = altura;
-    }
-
-    public double getPeso() {
-        return peso;
-    }
-
-    public void setPeso(double peso) {
-        this.peso = peso;
-    }
-
     public IMC getImc() {
         return imc;
     }
@@ -74,4 +52,9 @@ public class User implements Serializable {
         this.imc = imc;
     }
 
+    // Dentro da classe UserAtributos.java
+    @Override
+    public String toString() {
+        return this.nome + " (Idade: " + this.idade + ")\n" + this.imc.toString();
+    }
 }

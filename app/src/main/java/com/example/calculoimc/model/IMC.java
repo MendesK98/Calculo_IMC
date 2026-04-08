@@ -1,10 +1,13 @@
 package com.example.calculoimc.model;
 
+import java.util.Date;
+
 public class IMC {
     private double altura;
     private double peso;
     private double indice;
-
+    private double circunferencia;
+    private Date data;
     public IMC () {}
 
     public IMC (Double altura, Double peso) {
@@ -39,6 +42,11 @@ public class IMC {
         return imcDefinicao;
     }
 
+    @Override
+    public String toString() {
+        return "Data: " + data + " | IMC: " + String.format("%.2f", indice) + " (" + imcMessage() + ")";
+    }
+
     public Double getAltura() {
         return altura;
     }
@@ -63,4 +71,19 @@ public class IMC {
         this.indice = indice;
     }
 
+    public Date getData() {
+        return data;
+    }
+
+    public void setData(Date data) {
+        this.data = data;
+    }
+
+    public double getCircunferencia() {
+        return circunferencia;
+    }
+
+    public void setCircunferencia(double circunferencia) {
+        this.circunferencia = circunferencia;
+    }
 }

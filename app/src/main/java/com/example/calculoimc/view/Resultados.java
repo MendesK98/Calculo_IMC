@@ -7,12 +7,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.calculoimc.R;
 import com.example.calculoimc.model.IMC;
-import com.example.calculoimc.model.User;
 
 import java.text.DecimalFormat;
+import com.example.calculoimc.database.DataBase;
+import com.example.calculoimc.model.UserAtributos;
 
 public class Resultados extends AppCompatActivity {
 
@@ -59,7 +61,29 @@ public class Resultados extends AppCompatActivity {
             }
         });
 
-        //TODO criar botao salvar que salvará os IMCs de um determinado usuário em sua própria lista.
+
+        DataBase db = new DataBase(this);
+
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                UserAtributos user = new UserAtributos();
+                user.setNome("Teste");
+                user.setIdade(20);
+                user.getImc().setPeso(imc.getPeso());
+                user.getImc().setAltura(imc.getAltura());
+                user.setImc(imc);
+
+                boolean sucesso = db.addIMC(user);
+
+                if (sucesso) {
+                    Toast.makeText(Resultados.this, "Salvo com sucesso!", Toast.LENGTH_SHORT).show();
+                    save.setEnabled(false);
+                } else {
+                    Toast.makeText(Resultados.this, "Erro ao salvar.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
 
     }
