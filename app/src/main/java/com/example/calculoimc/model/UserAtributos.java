@@ -36,6 +36,10 @@ public class UserAtributos implements Serializable {
         return id;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public int getIdade() {
         return idade;
     }

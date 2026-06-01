@@ -1,11 +1,10 @@
 package com.example.calculoimc.database;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.content.ContentValues;
-import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -20,8 +19,8 @@ import java.util.Locale;
 
 public class DataBase extends SQLiteOpenHelper {
 
-    public static final String DB_NAME = "historico.db"; // Adicione o .db
-    public static final int DB_VERSION = 2;
+    public static final String DB_NAME = "historico.db";
+    public static final int DB_VERSION = 3;
     public static final String TABELA_HISTORICO = "historico";
     public static final String COL_ID = "id";
     public static final String COL_NOME = "nome";
@@ -38,7 +37,6 @@ public class DataBase extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        // Use String.format ou concatenação limpa
         String criarTabela = "CREATE TABLE " + TABELA_HISTORICO + " (" +
                 COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COL_NOME + " TEXT, " +
@@ -49,7 +47,6 @@ public class DataBase extends SQLiteOpenHelper {
                 COL_CIRCUNFERENCIA + " REAL," +
                 DATA_HORA + " DATETIME DEFAULT CURRENT_TIMESTAMP" +
                 ");";
-
         db.execSQL(criarTabela);
     }
 
@@ -61,22 +58,17 @@ public class DataBase extends SQLiteOpenHelper {
 
     public boolean addIMC(UserAtributos userAtributos) {
         SQLiteDatabase db = this.getWritableDatabase();
-
         ContentValues values = new ContentValues();
 
         values.put(COL_NOME, userAtributos.getNome());
         values.put(COL_IDADE, userAtributos.getIdade());
-
         values.put(COL_PESO, userAtributos.getImc().getPeso());
         values.put(COL_ALTURA, userAtributos.getImc().getAltura());
-
         values.put(COL_IMC, userAtributos.getImc().getIndice());
         values.put(COL_CIRCUNFERENCIA, userAtributos.getImc().getCircunferencia());
 
         long resultado = db.insert(TABELA_HISTORICO, null, values);
-
         db.close();
-
         return resultado != -1;
     }
 
@@ -84,38 +76,48 @@ public class DataBase extends SQLiteOpenHelper {
         List<UserAtributos> lista = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
-        // Consulta todos os dados
         String query = "SELECT * FROM " + TABELA_HISTORICO + " ORDER BY " + DATA_HORA + " DESC";
         Cursor cursor = db.rawQuery(query, null);
 
-        if (cursor.moveToFirst()) {
-            do {
-                // Criamos o objeto principal
-                UserAtributos user = new UserAtributos();
-                user.setNome(cursor.getString(cursor.getColumnIndexOrThrow(COL_NOME)));
-                user.setIdade(cursor.getInt(cursor.getColumnIndexOrThrow(COL_IDADE)));
-                user.getImc().setPeso(cursor.getDouble(cursor.getColumnIndexOrThrow(COL_PESO)));
-                user.getImc().setAltura(cursor.getDouble(cursor.getColumnIndexOrThrow(COL_ALTURA)));
-                user.getImc().setIndice(cursor.getDouble(cursor.getColumnIndexOrThrow(COL_IMC)));
-                user.getImc().setCircunferencia(cursor.getDouble(cursor.getColumnIndexOrThrow(COL_CIRCUNFERENCIA)));
+        try {
+            if (cursor.moveToFirst()) {
+                do {
+                    UserAtributos user = new UserAtributos();
 
-                String dataDoBanco = cursor.getString(cursor.getColumnIndexOrThrow(DATA_HORA));
+                    user.setId(cursor.getInt(cursor.getColumnIndexOrThrow(COL_ID)));
+                    user.setNome(cursor.getString(cursor.getColumnIndexOrThrow(COL_NOME)));
+                    user.setIdade(cursor.getInt(cursor.getColumnIndexOrThrow(COL_IDADE)));
+                    user.getImc().setPeso(cursor.getDouble(cursor.getColumnIndexOrThrow(COL_PESO)));
+                    user.getImc().setAltura(cursor.getDouble(cursor.getColumnIndexOrThrow(COL_ALTURA)));
+                    user.getImc().setIndice(cursor.getDouble(cursor.getColumnIndexOrThrow(COL_IMC)));
+                    user.getImc().setCircunferencia(cursor.getDouble(cursor.getColumnIndexOrThrow(COL_CIRCUNFERENCIA)));
 
-                try {
-                    SimpleDateFormat formatoBanco = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-                    Date dataConvertida = formatoBanco.parse(dataDoBanco);
+                    String dataDoBanco = cursor.getString(cursor.getColumnIndexOrThrow(DATA_HORA));
+                    try {
+                        SimpleDateFormat formatoBanco = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                        Date dataConvertida = formatoBanco.parse(dataDoBanco);
+                        user.getImc().setData(dataConvertida);
+                    } catch (Exception e) {
+                        Log.e("DB_ERROR", "Erro ao converter data: " + e.getMessage());
+                    }
 
-                    user.getImc().setData(dataConvertida);
-                } catch (Exception e) {
-                    Log.e("DB_ERROR", "Erro ao converter data: " + e.getMessage());
-                }
-
-                lista.add(user);
-            } while (cursor.moveToNext());
+                    lista.add(user);
+                } while (cursor.moveToNext());
+            }
+        } finally {
+            if (cursor != null) cursor.close();
+            db.close();
         }
-
-        cursor.close();
-        db.close();
+//        System.err.println("Itens no banco (classe de banco): " + lista.size());
         return lista;
+    }
+
+    public void deletarRegistro(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            db.delete(TABELA_HISTORICO, COL_ID + " = ?", new String[]{String.valueOf(id)});
+        } finally {
+            db.close();
+        }
     }
 }
