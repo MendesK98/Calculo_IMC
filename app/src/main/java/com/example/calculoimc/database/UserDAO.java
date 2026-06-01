@@ -15,6 +15,7 @@ public class UserDAO {
 
     public UserDAO(Context context) {
         dbHelper = new DataBase(context);
+        this.db = dbHelper.getWritableDatabase();
     }
 
     public void open() {
@@ -39,9 +40,21 @@ public class UserDAO {
             return db.insert("usuarios", null, values) != -1;
         }
     }
+
+    public boolean atualizar(UserAtributos user) {
+        ContentValues values = new ContentValues();
+        values.put("nome", user.getNome());
+        values.put("idade", user.getIdade());
+        values.put("altura", user.getAltura());
+        values.put("meta_peso", user.getMetaPeso());
+
+        String[] args = {String.valueOf(user.getId())};
+        return db.update("usuarios", values, "id = ?", args) > 0;
+    }
     public boolean excluir(int id) {
         return db.delete("usuarios", "id = ?", new String[]{String.valueOf(id)}) > 0;
     }
+
 
     public List<UserAtributos> listarTodos() {
         List<UserAtributos> lista = new ArrayList<>();
