@@ -83,7 +83,7 @@ public class DataBase extends SQLiteOpenHelper {
     }
 
     // Alterando o nome e adicionando o parâmetro de filtro
-    public List<UserAtributos> getRegistriesByUser(String nomeUsuario) {
+    public List<UserAtributos> getRegistriesByUser(String nomeUsuario, int limite) {
         List<UserAtributos> lista = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -91,7 +91,7 @@ public class DataBase extends SQLiteOpenHelper {
         // O ORDER BY continua garantindo que os mais recentes apareçam primeiro
         String query = "SELECT * FROM " + TABELA_HISTORICO +
                 " WHERE " + COL_NOME + " = ?" +
-                " ORDER BY " + DATA_HORA + " DESC";
+                " ORDER BY id DESC LIMIT " + limite;;
 
         // Passamos o nomeUsuario como argumento para evitar SQL Injection
         Cursor cursor = db.rawQuery(query, new String[]{nomeUsuario});

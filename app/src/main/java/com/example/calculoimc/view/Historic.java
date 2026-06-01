@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.calculoimc.R;
@@ -19,155 +20,160 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.YAxis;
+import com.google.android.material.chip.ChipGroup;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Historic extends AppCompatActivity {
 
-    private HistoricAdapter adapter; // Variável global para facilitar o refresh
+    private HistoricAdapter adapter;
+    private RecyclerView recyclerView;
+    private int filtroAtual = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_historic);
 
-        RecyclerView recyclerView = findViewById(R.id.recyclerViewHistorico);
-        DataBase db = new DataBase(this);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setTitle("Meu Histórico");
+        }
 
-        String nomeLogado = SessaoUsuario.getInstance().getUsuarioLogado().getNome();
-        List<UserAtributos> listaImc = db.getRegistriesByUser(nomeLogado);
-
-        gerarGrafico(listaImc);
-
-        // Configuração do RecyclerView
+        recyclerView = findViewById(R.id.recyclerViewHistorico);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        adapter = new HistoricAdapter(listaImc, position -> {
-            confirmarExclusao(position, listaImc, db);
+        // Lógica dos Chips (Filtro visível)
+        ChipGroup chipGroup = findViewById(R.id.chipGroupFiltro);
+        chipGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == R.id.chip10) {
+                atualizarListaComFiltro(10);
+            } else if (checkedId == R.id.chip50) {
+                atualizarListaComFiltro(50);
+            } else if (checkedId == R.id.chipTudo) {
+                atualizarListaComFiltro(100);
+            }
         });
 
+        atualizarListaComFiltro(filtroAtual);
+    }
+
+    private void atualizarListaComFiltro(int limite) {
+        this.filtroAtual = limite;
+        DataBase db = new DataBase(this);
+        if (!SessaoUsuario.getInstance().estaLogado()) return;
+
+        String nome = SessaoUsuario.getInstance().getUsuarioLogado().getNome();
+        // Busca todos e filtramos aqui para garantir a ordem do gráfico
+        List<UserAtributos> listaCompleta = db.getRegistriesByUser(nome, 999);
+
+        List<UserAtributos> listaFiltrada;
+        if (listaCompleta.size() > limite) {
+            listaFiltrada = new ArrayList<>(listaCompleta.subList(listaCompleta.size() - limite, listaCompleta.size()));
+        } else {
+            listaFiltrada = new ArrayList<>(listaCompleta);
+        }
+
+        // Gráfico (Ordem cronológica)
+        gerarGrafico(listaFiltrada);
+
+        // RecyclerView (Mais novo primeiro)
+        List<UserAtributos> listaRecycler = new ArrayList<>(listaFiltrada);
+        Collections.reverse(listaRecycler);
+
+        adapter = new HistoricAdapter(listaRecycler, position -> {
+            confirmarExclusao(position, listaRecycler, db);
+        });
         recyclerView.setAdapter(adapter);
     }
 
-    private void confirmarExclusao(int position, List<UserAtributos> listaImc, DataBase db) {
-        UserAtributos selecionado = listaImc.get(position);
-
-        new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("Excluir Registro")
-                .setMessage("Deseja apagar este registro de IMC?")
-                .setPositiveButton("Sim", (dialog, which) -> {
-                    // 1. Banco
-                    db.deletarRegistro(selecionado.getId());
-
-                    // 2. Lista e Adapter
-                    listaImc.remove(position);
-                    adapter.notifyItemRemoved(position);
-                    adapter.notifyItemRangeChanged(position, listaImc.size());
-
-                    // 3. Gráfico
-                    gerarGrafico(listaImc);
-
-                    android.widget.Toast.makeText(this, "Excluído!", Toast.LENGTH_SHORT).show();
-                })
-                .setNegativeButton("Cancelar", null)
-                .show();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(android.view.MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            android.content.Intent intent = new android.content.Intent(this, com.example.calculoimc.view.MainActivity.class);
-
-            intent.addFlags(android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP | android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
-            startActivity(intent);
-            finish();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
     private void gerarGrafico(List<UserAtributos> listaImc) {
         LineChart chart = findViewById(R.id.chartHistorico);
-
         if (listaImc == null || listaImc.isEmpty()) {
-            chart.setNoDataText("Nenhum dado para exibir.");
-            chart.invalidate();
+            chart.setNoDataText("Nenhum dado.");
+            chart.clear();
             return;
         }
 
-        UserAtributos usuarioLogado = SessaoUsuario.getInstance().getUsuarioLogado();
-
-        // 1. DATASET DO HISTÓRICO
-        List<Entry> entradasHistorico = new ArrayList<>();
+        List<Entry> entradas = new ArrayList<>();
         for (int i = 0; i < listaImc.size(); i++) {
-            float imcValor = (float) listaImc.get(i).getImc().getIndice();
-            entradasHistorico.add(new Entry(i, imcValor));
+            entradas.add(new Entry(i, (float) listaImc.get(i).getImc().getIndice()));
         }
 
-        LineDataSet dataSetHistorico = new LineDataSet(entradasHistorico, "Meu Progresso");
-        dataSetHistorico.setColor(Color.parseColor("#1976D2"));
-        dataSetHistorico.setCircleColor(Color.parseColor("#1976D2"));
-        dataSetHistorico.setLineWidth(3f);
-        dataSetHistorico.setCircleRadius(4f);
-        dataSetHistorico.setDrawCircleHole(false);
-        dataSetHistorico.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+        LineDataSet dataSet = new LineDataSet(entradas, "IMC");
+        dataSet.setColor(Color.parseColor("#1976D2"));
+        dataSet.setCircleColor(Color.parseColor("#1976D2"));
+        dataSet.setLineWidth(3f);
+        dataSet.setDrawValues(false);
+        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
 
-        // 2. DATASET DA META (DESTINO FIXO À DIREITA)
-        List<Entry> entradaMeta = new ArrayList<>();
-        float imcMeta = (float) (usuarioLogado != null ? usuarioLogado.getMetaIMC() : 0);
+        LineData lineData = new LineData(dataSet);
 
-        LineData lineData = new LineData(dataSetHistorico);
+        // Meta (Ponto Verde à Direita)
+        UserAtributos user = SessaoUsuario.getInstance().getUsuarioLogado();
+        if (user != null && user.getMetaIMC() > 0) {
+            float imcMeta = (float) user.getMetaIMC();
+            float maxX = Math.max(listaImc.size() + 1, 8);
 
-        if (imcMeta > 0) {
-            // FIXANDO A DIREITA:
-            // Definimos um valor fixo de "espaço" no gráfico.
-            // Se o histórico for pequeno, a meta fica longe.
-            // Se o histórico crescer, a meta continua na borda direita.
-            float limiteMaximoX = Math.max(listaImc.size() + 2, 10); // Garante um mínimo de 10 espaços
-            float posicaoMeta = limiteMaximoX - 0.5f; // Quase no fim do eixo
+            List<Entry> metaEntry = new ArrayList<>();
+            metaEntry.add(new Entry(maxX - 0.5f, imcMeta));
 
-            entradaMeta.add(new Entry(posicaoMeta, imcMeta));
+            LineDataSet metaSet = new LineDataSet(metaEntry, "Objetivo");
+            metaSet.setCircleColor(Color.parseColor("#4CAF50"));
+            metaSet.setCircleRadius(8f);
+            metaSet.setDrawCircleHole(true);
+            metaSet.setCircleHoleColor(Color.WHITE);
+            metaSet.setLineWidth(0f);
+            metaSet.setValueTextColor(Color.parseColor("#4CAF50"));
 
-            LineDataSet dataSetMeta = new LineDataSet(entradaMeta, "Linha de Chegada");
-            dataSetMeta.setCircleColor(Color.parseColor("#4CAF50"));
-            dataSetMeta.setCircleRadius(9f); // Ponto grande para destaque
-            dataSetMeta.setCircleHoleRadius(5f);
-            dataSetMeta.setCircleHoleColor(Color.WHITE);
-            dataSetMeta.setDrawCircleHole(true);
-            dataSetMeta.setLineWidth(0f);
-
-            // Texto indicando a meta
-            dataSetMeta.setDrawValues(true);
-            dataSetMeta.setValueTextSize(11f);
-            dataSetMeta.setValueTextColor(Color.parseColor("#4CAF50"));
-
-            lineData.addDataSet(dataSetMeta);
-
-            // Ajuste do Eixo X para fixar a borda
-            chart.getXAxis().setAxisMaximum(limiteMaximoX);
+            lineData.addDataSet(metaSet);
+            chart.getXAxis().setAxisMaximum(maxX);
         }
 
         chart.setData(lineData);
-
-        // --- CONFIGURAÇÕES DE EIXO ---
-        chart.getXAxis().setAxisMinimum(-0.5f);
-        chart.getXAxis().setDrawGridLines(false);
-        chart.getXAxis().setDrawLabels(false);
-
-        YAxis leftAxis = chart.getAxisLeft();
-        leftAxis.setAxisMinimum(10f);
-        leftAxis.setAxisMaximum(45f);
-        leftAxis.setDrawGridLines(true);
-        leftAxis.setGridColor(Color.LTGRAY);
-
-        chart.getAxisRight().setEnabled(false);
-        chart.getDescription().setEnabled(false);
-
-        // Aumenta o recuo à direita para o ponto não ser cortado
-        chart.setExtraRightOffset(50f);
-
-        chart.animateX(1000);
+        configurarEixos(chart);
         chart.invalidate();
     }
 
+    private void configurarEixos(LineChart chart) {
+        chart.getXAxis().setEnabled(false);
+        chart.getAxisRight().setEnabled(false);
+        chart.getDescription().setEnabled(false);
+
+        YAxis left = chart.getAxisLeft();
+        left.removeAllLimitLines();
+        left.setAxisMinimum(10f);
+        left.setAxisMaximum(45f);
+
+        addLimit(left, 18.6f, "Mínimo", "#90A4AE");
+        addLimit(left, 25.0f, "Máximo", "#90A4AE");
+        addLimit(left, 40.0f, "Alerta", "#EF5350");
+    }
+
+    private void addLimit(YAxis axis, float val, String label, String color) {
+        LimitLine ll = new LimitLine(val, label);
+        ll.setLineColor(Color.parseColor(color));
+        ll.setTextColor(Color.parseColor(color));
+        ll.setLineWidth(1f);
+        axis.addLimitLine(ll);
+    }
+
+    private void confirmarExclusao(int pos, List<UserAtributos> lista, DataBase db) {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Excluir")
+                .setMessage("Deseja apagar?")
+                .setPositiveButton("Sim", (d, w) -> {
+                    db.deletarRegistro(lista.get(pos).getId());
+                    atualizarListaComFiltro(filtroAtual);
+                })
+                .setNegativeButton("Não", null).show();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) { finish(); return true; }
+        return super.onOptionsItemSelected(item);
+    }
 }
