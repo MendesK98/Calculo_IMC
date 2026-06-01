@@ -13,6 +13,7 @@ import com.example.calculoimc.model.UserAtributos;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -125,8 +126,53 @@ public class DataBase extends SQLiteOpenHelper {
             }
         } finally {
             if (cursor != null) cursor.close();
-            // Nota: Evite fechar o db aqui se você for chamar essa função em loops,
-            // mas para chamadas únicas está ok.
+            db.close();
+        }
+        return lista;
+    }
+
+    public List<UserAtributos> getRegistriesByPeriod(String nomeUsuario, int meses) {
+        List<UserAtributos> lista = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // A consulta usa a função date() do SQLite para subtrair os meses da data atual
+        String query = "SELECT * FROM " + TABELA_HISTORICO +
+                " WHERE " + COL_NOME + " = ?" +
+                " AND " + DATA_HORA + " >= date('now', '-" + meses + " months')" +
+                " ORDER BY id DESC";
+
+        Cursor cursor = db.rawQuery(query, new String[]{nomeUsuario});
+
+        try {
+            if (cursor.moveToFirst()) {
+                do {
+                    UserAtributos user = new UserAtributos();
+
+                    user.setId(cursor.getInt(cursor.getColumnIndexOrThrow(COL_ID)));
+                    user.setNome(cursor.getString(cursor.getColumnIndexOrThrow(COL_NOME)));
+                    user.setIdade(cursor.getInt(cursor.getColumnIndexOrThrow(COL_IDADE)));
+
+                    user.getImc().setPeso(cursor.getDouble(cursor.getColumnIndexOrThrow(COL_PESO)));
+                    user.getImc().setAltura(cursor.getDouble(cursor.getColumnIndexOrThrow(COL_ALTURA)));
+                    user.getImc().setIndice(cursor.getDouble(cursor.getColumnIndexOrThrow(COL_IMC)));
+                    user.getImc().setCircunferencia(cursor.getDouble(cursor.getColumnIndexOrThrow(COL_CIRCUNFERENCIA)));
+
+                    // --- CORREÇÃO AQUI ---
+                    String dataDoBanco = cursor.getString(cursor.getColumnIndexOrThrow(DATA_HORA));
+                    try {
+                        // O SQLite salva como yyyy-MM-dd HH:mm:ss
+                        SimpleDateFormat formatoBanco = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                        Date dataConvertida = formatoBanco.parse(dataDoBanco);
+                        user.getImc().setData(dataConvertida);
+                    } catch (Exception e) {
+                        Log.e("DB_ERROR", "Erro ao converter data no periodo: " + e.getMessage());
+                    }
+
+                    lista.add(user);
+                } while (cursor.moveToNext());
+            }
+        } finally {
+            if (cursor != null) cursor.close();
             db.close();
         }
         return lista;
@@ -138,6 +184,44 @@ public class DataBase extends SQLiteOpenHelper {
         try {
             db.delete(TABELA_HISTORICO, COL_ID + " = ?", new String[]{String.valueOf(id)});
         } finally {
+            db.close();
+        }
+    }
+
+    public void gerarDadosTeste(String nomeUsuario) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+
+        db.beginTransaction(); // Usar transação deixa o processo muito mais rápido
+        try {
+            for (int mes = 0; mes < 12; mes++) {
+                for (int i = 0; i < 20; i++) {
+                    ContentValues values = new ContentValues();
+
+                    // Calcula a data retroativa
+                    Calendar cal = Calendar.getInstance();
+                    cal.add(Calendar.MONTH, -mes);
+                    cal.add(Calendar.DAY_OF_MONTH, -i); // Espalha os registros pelos dias
+                    String dataRetroativa = sdf.format(cal.getTime());
+
+                    // Gera valores de IMC aleatórios para o gráfico não ficar reto
+                    double pesoFake = 70 + (Math.random() * 20); // Entre 70kg e 90kg
+                    double imcFake = pesoFake / (1.75 * 1.75);
+
+                    values.put(COL_NOME, nomeUsuario);
+                    values.put(COL_IDADE, 30);
+                    values.put(COL_PESO, pesoFake);
+                    values.put(COL_ALTURA, 1.75);
+                    values.put(COL_IMC, imcFake);
+                    values.put(COL_CIRCUNFERENCIA, 85.0);
+                    values.put(DATA_HORA, dataRetroativa); // Inserindo a data manual
+
+                    db.insert(TABELA_HISTORICO, null, values);
+                }
+            }
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
             db.close();
         }
     }
