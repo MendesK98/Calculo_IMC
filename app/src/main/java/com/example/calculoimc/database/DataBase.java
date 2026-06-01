@@ -20,7 +20,7 @@ import java.util.Locale;
 public class DataBase extends SQLiteOpenHelper {
 
     public static final String DB_NAME = "historico.db";
-    public static final int DB_VERSION = 5;
+    public static final int DB_VERSION = 6;
     public static final String TABELA_HISTORICO = "historico";
     public static final String COL_ID = "id";
     public static final String COL_NOME = "nome";
@@ -51,7 +51,7 @@ public class DataBase extends SQLiteOpenHelper {
 
         String criarTabelaUsuarios = "CREATE TABLE usuarios (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "nome TEXT, " +
+                "nome TEXT UNIQUE, " +
                 "idade INTEGER, " +
                 "altura REAL, " +
                 "meta_peso REAL, " +

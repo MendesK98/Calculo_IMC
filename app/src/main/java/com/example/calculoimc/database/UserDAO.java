@@ -76,8 +76,19 @@ public class UserDAO {
         return lista;
     }
 
-    // DELETE (CRUD)
-    public void deletar(int id) {
-        db.delete("usuarios", "id = ?", new String[]{String.valueOf(id)});
+    public boolean nomeJaExiste(String nome) {
+        // Abre o banco para leitura
+        db = dbHelper.getReadableDatabase();
+
+        // Faz a busca pelo nome exato (ignora maiúsculas/minúsculas dependendo da config do SQLite, mas geralmente é sensível)
+        Cursor cursor = db.query("usuarios",
+                new String[]{"id"},
+                "nome = ?",
+                new String[]{nome},
+                null, null, null);
+
+        boolean existe = cursor.getCount() > 0;
+        cursor.close();
+        return existe;
     }
 }

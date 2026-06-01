@@ -124,25 +124,38 @@ public class UserManagerActivity extends AppCompatActivity implements UserAdapte
     }
 
     private void salvarOuAtualizar() {
-        String nome = editNome.getText().toString();
+        String nome = editNome.getText().toString().trim(); // Use .trim() para evitar nomes só com espaços
         String idadeStr = editIdade.getText().toString();
         String alturaStr = editAltura.getText().toString();
         String metaStr = editMetaPeso.getText().toString();
 
+        // 1. PRIMEIRO: Verifica se algo está vazio
         if (nome.isEmpty() || idadeStr.isEmpty() || alturaStr.isEmpty() || metaStr.isEmpty()) {
             Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show();
             return;
         }
 
+        // 2. SEGUNDO: Valida duplicidade de nome
+        if (usuarioEmEdicao == null || usuarioEmEdicao.getId() == 0) {
+            if (userDAO.nomeJaExiste(nome)) {
+                Toast.makeText(this, "Erro: Já existe um usuário com este nome!", Toast.LENGTH_LONG).show();
+                return;
+            }
+        } else if (!nome.equalsIgnoreCase(usuarioEmEdicao.getNome())) {
+            if (userDAO.nomeJaExiste(nome)) {
+                Toast.makeText(this, "Erro: Este nome já está em uso por outro usuário!", Toast.LENGTH_LONG).show();
+                return;
+            }
+        }
+
+        // 3. TERCEIRO: Processa o salvamento
         if (usuarioEmEdicao == null) {
-            // MODO CADASTRO
             UserAtributos novo = new UserAtributos();
             preencherDados(novo, nome, idadeStr, alturaStr, metaStr);
             if (userDAO.salvar(novo)) {
                 Toast.makeText(this, "Usuário cadastrado!", Toast.LENGTH_SHORT).show();
             }
         } else {
-            // MODO EDIÇÃO
             preencherDados(usuarioEmEdicao, nome, idadeStr, alturaStr, metaStr);
             if (userDAO.atualizar(usuarioEmEdicao)) {
                 Toast.makeText(this, "Dados atualizados!", Toast.LENGTH_SHORT).show();
