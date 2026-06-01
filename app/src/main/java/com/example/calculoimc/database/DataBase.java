@@ -20,7 +20,7 @@ import java.util.Locale;
 public class DataBase extends SQLiteOpenHelper {
 
     public static final String DB_NAME = "historico.db";
-    public static final int DB_VERSION = 3;
+    public static final int DB_VERSION = 5;
     public static final String TABELA_HISTORICO = "historico";
     public static final String COL_ID = "id";
     public static final String COL_NOME = "nome";
@@ -48,11 +48,21 @@ public class DataBase extends SQLiteOpenHelper {
                 DATA_HORA + " DATETIME DEFAULT CURRENT_TIMESTAMP" +
                 ");";
         db.execSQL(criarTabela);
+
+        String criarTabelaUsuarios = "CREATE TABLE usuarios (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "nome TEXT, " +
+                "idade INTEGER, " +
+                "altura REAL, " +
+                "meta_peso REAL, " +
+                "meta_imc REAL);";
+        db.execSQL(criarTabelaUsuarios);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + TABELA_HISTORICO);
+        db.execSQL("DROP TABLE IF EXISTS usuarios");
         onCreate(db);
     }
 

@@ -13,6 +13,7 @@ import android.widget.Button;
 
 import com.example.calculoimc.R;
 import com.example.calculoimc.database.DataBase;
+import com.example.calculoimc.model.SessaoUsuario;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -57,6 +58,24 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
 
+        if (id == R.id.menu_usuarios) {
+            // CHAMA A ATIVIDADE DE GERENCIAMENTO DE USUÁRIOS
+            Intent intent = new Intent(this, UserManagerActivity.class);
+            startActivity(intent);
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (SessaoUsuario.getInstance().estaLogado()) {
+            String nome = SessaoUsuario.getInstance().getUsuarioLogado().getNome();
+            setTitle("Olá, " + nome);
+        } else {
+            setTitle("Calculadora IMC (Sem usuário)");
+        }
     }
 }

@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import com.example.calculoimc.R;
+import com.example.calculoimc.adapter.HistoricAdapter;
 import com.example.calculoimc.database.DataBase;
 import com.example.calculoimc.model.UserAtributos;
 import com.github.mikephil.charting.charts.LineChart;

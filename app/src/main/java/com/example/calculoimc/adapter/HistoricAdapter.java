@@ -1,4 +1,4 @@
-package com.example.calculoimc.view;
+package com.example.calculoimc.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;

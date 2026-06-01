@@ -3,6 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/menu_usuarios"
+        android:title="Gerenciar Usuários"
+        android:icon="@drawable/baseline_manage_accounts_24"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/menu_historico"
         android:title="Histórico"
         android:icon="@android:drawable/ic_menu_recent_history"
