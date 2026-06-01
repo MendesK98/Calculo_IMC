@@ -32,7 +32,7 @@ public class UserDAO {
         values.put("idade", user.getIdade());
         values.put("altura", user.getAltura());
         values.put("meta_peso", user.getMetaPeso());
-        values.put("meta_imc", user.getMetaIMC()); // Salva o calculado
+        values.put("meta_imc", user.getMetaIMC());
 
         if (user.getId() > 0) {
             return db.update("usuarios", values, "id = ?", new String[]{String.valueOf(user.getId())}) > 0;

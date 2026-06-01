@@ -67,20 +67,27 @@ public class Resultados extends AppCompatActivity {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                UserAtributos user = new UserAtributos();
-                user.setNome("Teste");
-                user.setIdade(20);
-                user.getImc().setPeso(imc.getPeso());
-                user.getImc().setAltura(imc.getAltura());
-                user.setImc(imc);
+                // 1. Busca o usuário que está logado na sessão atual
+                UserAtributos usuarioLogado = com.example.calculoimc.model.SessaoUsuario.getInstance().getUsuarioLogado();
 
-                boolean sucesso = db.addIMC(user);
+                if (usuarioLogado != null) {
+                    UserAtributos registroParaSalvar = new UserAtributos();
 
-                if (sucesso) {
-                    Toast.makeText(Resultados.this, "Salvo com sucesso!", Toast.LENGTH_SHORT).show();
-                    save.setEnabled(false);
+                    registroParaSalvar.setNome(usuarioLogado.getNome());
+                    registroParaSalvar.setIdade(usuarioLogado.getIdade());
+
+                    registroParaSalvar.setImc(imc);
+
+                    boolean sucesso = db.addIMC(registroParaSalvar);
+
+                    if (sucesso) {
+                        Toast.makeText(Resultados.this, "Resultado salvo para " + usuarioLogado.getNome(), Toast.LENGTH_SHORT).show();
+                        save.setEnabled(false);
+                    } else {
+                        Toast.makeText(Resultados.this, "Erro ao salvar no banco de dados.", Toast.LENGTH_SHORT).show();
+                    }
                 } else {
-                    Toast.makeText(Resultados.this, "Erro ao salvar.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Resultados.this, "Erro: Nenhum usuário selecionado!", Toast.LENGTH_LONG).show();
                 }
             }
         });
