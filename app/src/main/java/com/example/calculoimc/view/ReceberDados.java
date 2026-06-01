@@ -16,6 +16,8 @@ import android.widget.Button;
 import com.example.calculoimc.R;
 import com.example.calculoimc.model.DecimalDigitsInputFilter;
 import com.example.calculoimc.model.MetodosGerais;
+import com.example.calculoimc.model.SessaoUsuario;
+import com.example.calculoimc.model.UserAtributos;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -23,6 +25,7 @@ public class ReceberDados extends AppCompatActivity {
 
     private TextInputEditText peso, altura;
     private MaterialButtonToggleGroup toggleGroup;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +40,13 @@ public class ReceberDados extends AppCompatActivity {
         altura = findViewById(R.id.tAltura);
         toggleGroup = findViewById(R.id.toggleGroup);
         Button calcular = findViewById(R.id.btCalcular);
+
+        //Buscar altura do usuário logado
+        SessaoUsuario sessao = SessaoUsuario.getInstance();
+        if (sessao.estaLogado()) {
+            double alt = sessao.getUsuarioLogado().getAltura();
+            altura.setText(String.valueOf(alt));
+        }
 
         configurarFiltros(false);
         inicializarToggle();

@@ -1,5 +1,6 @@
 package com.example.calculoimc.view;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -65,6 +66,7 @@ public class UserManagerActivity extends AppCompatActivity implements UserAdapte
         fabAddUsuario.setOnClickListener(v -> {
             alternarFormulario();
         });
+
     }
 
     private void salvarUsuario() {
@@ -118,7 +120,7 @@ public class UserManagerActivity extends AppCompatActivity implements UserAdapte
     public void onUserClick(UserAtributos usuario) {
         SessaoUsuario.getInstance().setUsuarioLogado(usuario);
         Toast.makeText(this, "Usuário " + usuario.getNome() + " selecionado!", Toast.LENGTH_SHORT).show();
-        userAdapter.notifyDataSetChanged(); // Para atualizar a cor verde na lista
+        userAdapter.notifyDataSetChanged();
     }
 
     @Override
