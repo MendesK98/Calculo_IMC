@@ -82,12 +82,19 @@ public class DataBase extends SQLiteOpenHelper {
         return resultado != -1;
     }
 
-    public List<UserAtributos> getAllUsersWithIMC() {
+    // Alterando o nome e adicionando o parâmetro de filtro
+    public List<UserAtributos> getRegistriesByUser(String nomeUsuario) {
         List<UserAtributos> lista = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
-        String query = "SELECT * FROM " + TABELA_HISTORICO + " ORDER BY " + DATA_HORA + " DESC";
-        Cursor cursor = db.rawQuery(query, null);
+        // Adicionamos a cláusula WHERE para filtrar pelo nome
+        // O ORDER BY continua garantindo que os mais recentes apareçam primeiro
+        String query = "SELECT * FROM " + TABELA_HISTORICO +
+                " WHERE " + COL_NOME + " = ?" +
+                " ORDER BY " + DATA_HORA + " DESC";
+
+        // Passamos o nomeUsuario como argumento para evitar SQL Injection
+        Cursor cursor = db.rawQuery(query, new String[]{nomeUsuario});
 
         try {
             if (cursor.moveToFirst()) {
@@ -97,6 +104,8 @@ public class DataBase extends SQLiteOpenHelper {
                     user.setId(cursor.getInt(cursor.getColumnIndexOrThrow(COL_ID)));
                     user.setNome(cursor.getString(cursor.getColumnIndexOrThrow(COL_NOME)));
                     user.setIdade(cursor.getInt(cursor.getColumnIndexOrThrow(COL_IDADE)));
+
+                    // Preenchendo os dados do IMC
                     user.getImc().setPeso(cursor.getDouble(cursor.getColumnIndexOrThrow(COL_PESO)));
                     user.getImc().setAltura(cursor.getDouble(cursor.getColumnIndexOrThrow(COL_ALTURA)));
                     user.getImc().setIndice(cursor.getDouble(cursor.getColumnIndexOrThrow(COL_IMC)));
@@ -116,11 +125,13 @@ public class DataBase extends SQLiteOpenHelper {
             }
         } finally {
             if (cursor != null) cursor.close();
+            // Nota: Evite fechar o db aqui se você for chamar essa função em loops,
+            // mas para chamadas únicas está ok.
             db.close();
         }
-//        System.err.println("Itens no banco (classe de banco): " + lista.size());
         return lista;
     }
+
 
     public void deletarRegistro(int id) {
         SQLiteDatabase db = this.getWritableDatabase();

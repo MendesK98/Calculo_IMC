@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.calculoimc.R;
 import com.example.calculoimc.database.DataBase;
@@ -56,20 +57,46 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // 1. Localiza o item do histórico pelo ID que está no seu XML
+        MenuItem itemHistorico = menu.findItem(R.id.menu_historico);
+
+        // 2. Verifica se existe um usuário logado
+        boolean estaLogado = SessaoUsuario.getInstance().estaLogado();
+
+        // 3. Define se o botão está habilitado e qual a sua opacidade visual
+        if (itemHistorico != null) {
+            itemHistorico.setEnabled(estaLogado);
+
+            // Opcional: Deixa o ícone cinza/apagado quando desativado
+            if (itemHistorico.getIcon() != null) {
+                itemHistorico.getIcon().setAlpha(estaLogado ? 255 : 100);
+            }
+        }
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    // Mantenha o onCreateOptionsMenu
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_principal, menu);
         return true;
     }
 
+    // DELETE THIS BLOCK
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
 
         if (id == R.id.menu_historico) {
-            // Navegar para a sua Activity de Histórico
-            Intent intent = new Intent(this, Historic.class);
-            startActivity(intent);
+            if (SessaoUsuario.getInstance().estaLogado()) {
+                Intent intent = new Intent(this, Historic.class);
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "Selecione um usuário primeiro!", Toast.LENGTH_SHORT).show();
+            }
             return true;
         }
 
@@ -79,13 +106,17 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
+
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        // Força o Android a rodar o 'onPrepareOptionsMenu' e checar se o usuário logou
+        invalidateOptionsMenu();
+
         if (SessaoUsuario.getInstance().estaLogado()) {
             String nome = SessaoUsuario.getInstance().getUsuarioLogado().getNome();
             setTitle("Olá, " + nome);

@@ -11,6 +11,7 @@ import android.widget.Toast;
 import com.example.calculoimc.R;
 import com.example.calculoimc.adapter.HistoricAdapter;
 import com.example.calculoimc.database.DataBase;
+import com.example.calculoimc.model.SessaoUsuario;
 import com.example.calculoimc.model.UserAtributos;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
@@ -32,7 +33,9 @@ public class Historic extends AppCompatActivity {
 
         RecyclerView recyclerView = findViewById(R.id.recyclerViewHistorico);
         DataBase db = new DataBase(this);
-        List<UserAtributos> listaImc = db.getAllUsersWithIMC();
+
+        String nomeLogado = SessaoUsuario.getInstance().getUsuarioLogado().getNome();
+        List<UserAtributos> listaImc = db.getRegistriesByUser(nomeLogado);
 
         gerarGrafico(listaImc);
 

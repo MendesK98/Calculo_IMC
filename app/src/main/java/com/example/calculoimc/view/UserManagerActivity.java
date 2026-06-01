@@ -58,6 +58,14 @@ public class UserManagerActivity extends AppCompatActivity implements UserAdapte
         configurarMonitoramentoDeDados();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Isso força o Android a chamar o onPrepareOptionsMenu novamente
+        invalidateOptionsMenu();
+    }
+
     private void inicializarComponentes() {
         editNome = findViewById(R.id.editNomeUsuario);
         editIdade = findViewById(R.id.editIdadeUsuario);
