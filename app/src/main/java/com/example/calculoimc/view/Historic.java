@@ -86,83 +86,87 @@ public class Historic extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
     private void gerarGrafico(List<UserAtributos> listaImc) {
         LineChart chart = findViewById(R.id.chartHistorico);
 
-        // 1. Verificação de segurança: se não há dados, não gera gráfico
         if (listaImc == null || listaImc.isEmpty()) {
-            chart.setNoDataText("Nenhum dado para exibir no gráfico.");
+            chart.setNoDataText("Nenhum dado para exibir.");
             chart.invalidate();
             return;
         }
 
-        // Configurações do Eixo Y (Zona Verde)
-        YAxis leftAxis = chart.getAxisLeft();
-        leftAxis.removeAllLimitLines(); // Limpa linhas antigas para não duplicar se der refresh
+        UserAtributos usuarioLogado = SessaoUsuario.getInstance().getUsuarioLogado();
 
-        LimitLine ll1 = new LimitLine(18.6f, "Mínimo Ideal");
-        ll1.setLineWidth(1f);
-        ll1.setLineColor(Color.parseColor("#4CAF50")); // Verde mais nítido
-        ll1.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_BOTTOM);
-
-        LimitLine ll2 = new LimitLine(25.0f, "Máximo Ideal");
-        ll2.setLineWidth(1f);
-        ll2.setLineColor(Color.parseColor("#4CAF50")); // Verde mais nítido superior
-        ll2.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_BOTTOM);
-
-        LimitLine ll3 = new LimitLine(40.0f, "Limite Alerta");
-        ll3.setLineWidth(1f);
-        ll3.setLineColor(Color.parseColor("#F44336")); // Vermelho para o alerta superior
-        ll3.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_TOP);
-
-        leftAxis.addLimitLine(ll1);
-        leftAxis.addLimitLine(ll2);
-        leftAxis.addLimitLine(ll3);
-        leftAxis.setDrawLimitLinesBehindData(true);
-
-        // Deixa o gráfico respirar: define limites fixos para o eixo Y
-        leftAxis.setAxisMinimum(10f);
-        leftAxis.setAxisMaximum(45f);
-
-
-
-        // Eixo Direita e X: Limpeza visual
-        chart.getAxisRight().setEnabled(false);
-        chart.getXAxis().setDrawGridLines(false);
-        chart.getXAxis().setGranularity(1f); // Evita números repetidos no eixo X
-
-        // 2. Preenchimento dos dados
-        List<Entry> entradas = new ArrayList<>();
+        // 1. DATASET DO HISTÓRICO
+        List<Entry> entradasHistorico = new ArrayList<>();
         for (int i = 0; i < listaImc.size(); i++) {
             float imcValor = (float) listaImc.get(i).getImc().getIndice();
-            entradas.add(new Entry(i, imcValor));
+            entradasHistorico.add(new Entry(i, imcValor));
         }
 
-        // 3. Configuração visual da linha
-        LineDataSet dataSet = new LineDataSet(entradas, "Evolução do IMC");
-        dataSet.setColor(Color.parseColor("#2196F3"));
-        dataSet.setCircleColor(Color.parseColor("#1976D2"));
-        dataSet.setLineWidth(3f);
-        dataSet.setCircleRadius(5f);
-        dataSet.setDrawCircleHole(true);
-        dataSet.setValueTextSize(10f);
+        LineDataSet dataSetHistorico = new LineDataSet(entradasHistorico, "Meu Progresso");
+        dataSetHistorico.setColor(Color.parseColor("#1976D2"));
+        dataSetHistorico.setCircleColor(Color.parseColor("#1976D2"));
+        dataSetHistorico.setLineWidth(3f);
+        dataSetHistorico.setCircleRadius(4f);
+        dataSetHistorico.setDrawCircleHole(false);
+        dataSetHistorico.setMode(LineDataSet.Mode.CUBIC_BEZIER);
 
-        // Estilo da área preenchida
-        dataSet.setDrawFilled(true);
-        dataSet.setFillAlpha(40);
-        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+        // 2. DATASET DA META (DESTINO FIXO À DIREITA)
+        List<Entry> entradaMeta = new ArrayList<>();
+        float imcMeta = (float) (usuarioLogado != null ? usuarioLogado.getMetaIMC() : 0);
 
-        LineData lineData = new LineData(dataSet);
+        LineData lineData = new LineData(dataSetHistorico);
+
+        if (imcMeta > 0) {
+            // FIXANDO A DIREITA:
+            // Definimos um valor fixo de "espaço" no gráfico.
+            // Se o histórico for pequeno, a meta fica longe.
+            // Se o histórico crescer, a meta continua na borda direita.
+            float limiteMaximoX = Math.max(listaImc.size() + 2, 10); // Garante um mínimo de 10 espaços
+            float posicaoMeta = limiteMaximoX - 0.5f; // Quase no fim do eixo
+
+            entradaMeta.add(new Entry(posicaoMeta, imcMeta));
+
+            LineDataSet dataSetMeta = new LineDataSet(entradaMeta, "Linha de Chegada");
+            dataSetMeta.setCircleColor(Color.parseColor("#4CAF50"));
+            dataSetMeta.setCircleRadius(9f); // Ponto grande para destaque
+            dataSetMeta.setCircleHoleRadius(5f);
+            dataSetMeta.setCircleHoleColor(Color.WHITE);
+            dataSetMeta.setDrawCircleHole(true);
+            dataSetMeta.setLineWidth(0f);
+
+            // Texto indicando a meta
+            dataSetMeta.setDrawValues(true);
+            dataSetMeta.setValueTextSize(11f);
+            dataSetMeta.setValueTextColor(Color.parseColor("#4CAF50"));
+
+            lineData.addDataSet(dataSetMeta);
+
+            // Ajuste do Eixo X para fixar a borda
+            chart.getXAxis().setAxisMaximum(limiteMaximoX);
+        }
+
         chart.setData(lineData);
 
-        // Perfumaria final
+        // --- CONFIGURAÇÕES DE EIXO ---
+        chart.getXAxis().setAxisMinimum(-0.5f);
+        chart.getXAxis().setDrawGridLines(false);
+        chart.getXAxis().setDrawLabels(false);
+
+        YAxis leftAxis = chart.getAxisLeft();
+        leftAxis.setAxisMinimum(10f);
+        leftAxis.setAxisMaximum(45f);
+        leftAxis.setDrawGridLines(true);
+        leftAxis.setGridColor(Color.LTGRAY);
+
+        chart.getAxisRight().setEnabled(false);
         chart.getDescription().setEnabled(false);
-        chart.setTouchEnabled(true);
-        chart.setDragEnabled(true);
-        chart.setScaleEnabled(true);
-        chart.setPinchZoom(true);
-        chart.animateXY(1000, 1000);
+
+        // Aumenta o recuo à direita para o ponto não ser cortado
+        chart.setExtraRightOffset(50f);
+
+        chart.animateX(1000);
         chart.invalidate();
     }
 
