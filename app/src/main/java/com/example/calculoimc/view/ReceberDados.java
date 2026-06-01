@@ -59,9 +59,6 @@ public class ReceberDados extends AppCompatActivity {
             return;
         }
 
-        sAltura = sAltura.replace(',', '.');
-        sPeso = sPeso.replace(',', '.');
-
         MetodosGerais mtg = new MetodosGerais();
         Double dPeso = mtg.ConverStringToDouble(sPeso);
         Double dAltura = mtg.ConverStringToDouble(sAltura);
@@ -104,13 +101,9 @@ public class ReceberDados extends AppCompatActivity {
         if (isImperial) {
             peso.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(3, 2)});
             altura.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(2, 2)});
-            peso.setHint("Peso (libras)");
-            altura.setHint("Altura (polegadas)");
         } else {
             peso.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(3, 2)});
             altura.setFilters(new InputFilter[]{new DecimalDigitsInputFilter(1, 2)});
-            peso.setHint("Peso (kg)");
-            altura.setHint("Altura (ex: 1.75)");
         }
     }
 
