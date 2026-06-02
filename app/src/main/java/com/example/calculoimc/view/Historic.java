@@ -207,6 +207,8 @@ public class Historic extends AppCompatActivity {
             metaEntry.add(new Entry(maxX - 0.5f, imcMeta));
 
             LineDataSet metaSet = new LineDataSet(metaEntry, "Minha Meta");
+            metaSet.setColor(Color.parseColor("#4CAF50"));
+
             metaSet.setCircleColor(Color.parseColor("#4CAF50"));
             metaSet.setCircleRadius(8f);
             metaSet.setDrawCircleHole(true);
