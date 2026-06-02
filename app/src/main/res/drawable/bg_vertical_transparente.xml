@@ -1,4 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<bitmap xmlns:android="http://schemas.android.com/apk/res/android"
-    android:src="@drawable/vertical"
-    android:alpha="0.8" />
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item>
+        <bitmap
+            android:src="@drawable/vertical"
+            android:alpha="0.7"
+            android:mipMap="false"
+            android:tileMode="disabled"
+            android:gravity="fill" /> </item>
+
+    <item>
+        <shape>
+            <solid android:color="#66020202" />
+
+            <stroke
+                android:width="1dp"
+                android:color="#40000000" />
+
+            <corners android:radius="16dp" />
+        </shape>
+    </item>
+
+</layer-list>
