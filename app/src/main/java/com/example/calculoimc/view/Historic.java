@@ -4,12 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -24,8 +23,8 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.YAxis;
+import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.chip.ChipGroup;
-import com.google.android.material.materialswitch.MaterialSwitch;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,70 +34,74 @@ public class Historic extends AppCompatActivity {
 
     private HistoricAdapter adapter;
     private RecyclerView recyclerView;
+    private LineChart chart;
 
     // Variáveis de controle de estado
     private int quantidadeSelecionada = 10;
+    private int mesesSelecionados = 3;
     private boolean modoPeriodoAtivo = false;
-    private String tituloSwitch= "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //Função utilizada para gerar dados para teste.
-//        if (SessaoUsuario.getInstance().estaLogado()) {
-//            DataBase db = new DataBase(this);
-//            db.gerarDadosTeste(SessaoUsuario.getInstance().getUsuarioLogado().getNome());
-//            Toast.makeText(this, "Dados de teste gerados!", Toast.LENGTH_SHORT).show();
-//        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_historic);
 
-        // Configuração da Toolbar
+        // 1. Lógica para gerar dados de teste (Apenas uma vez)
+        if (SessaoUsuario.getInstance().estaLogado()) {
+            SharedPreferences prefs = getSharedPreferences("config_teste", MODE_PRIVATE);
+            boolean jaGerou = prefs.getBoolean("dados_gerados", false);
+
+            if (!jaGerou) {
+                DataBase db = new DataBase(this);
+                db.gerarDadosTeste(SessaoUsuario.getInstance().getUsuarioLogado().getNome());
+
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putBoolean("dados_gerados", true);
+                editor.apply();
+
+                Toast.makeText(this, "Dados de teste gerados pela primeira vez!", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        // 2. Configuração da Toolbar
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setTitle("Meu Histórico");
         }
 
-        // 1. Inicialização dos componentes de UI
+        // 3. Inicialização dos componentes de UI
+        chart = findViewById(R.id.chartHistorico);
         recyclerView = findViewById(R.id.recyclerViewHistorico);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        MaterialSwitch switchTipoFiltro = findViewById(R.id.switchTipoFiltro);
+        MaterialButtonToggleGroup toggleGroupFiltro = findViewById(R.id.toggleGroupFiltro);
         LinearLayout containerQuantidade = findViewById(R.id.containerQuantidade);
         LinearLayout containerPeriodo = findViewById(R.id.containerPeriodo);
 
-        ChipGroup chipGroup = findViewById(R.id.chipGroupFiltro);
-        EditText editMeses = findViewById(R.id.editMeses);
-        Button btnAplicarPeriodo = findViewById(R.id.btnAplicarPeriodo);
+        ChipGroup chipGroupQtd = findViewById(R.id.chipGroupQtd);
+        ChipGroup chipGroupPeriodo = findViewById(R.id.chipGroupPeriodo);
 
-        // 2. Lógica do Interruptor (Alternar entre modo Quantidade e modo Período)
-        switchTipoFiltro.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            modoPeriodoAtivo = isChecked;
-
+        // 4. Lógica do Toggle Group (Alternar entre Abas de Quantidade e Período)
+        toggleGroupFiltro.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
             if (isChecked) {
-                // Ativou modo PERÍODO
-                containerQuantidade.setVisibility(View.GONE);
-                containerPeriodo.setVisibility(View.VISIBLE);
-
-                tituloSwitch = "Filtrar por Período";
-
-                // Executa o filtro baseado no valor que já está no EditText
-                String mesesStr = editMeses.getText().toString();
-                processarFiltroPorPeriodo(mesesStr);
-            } else {
-                // Ativou modo QUANTIDADE
-                containerQuantidade.setVisibility(View.VISIBLE);
-                containerPeriodo.setVisibility(View.GONE);
-
-                tituloSwitch = "Filtrar por Quantidade";
-
-                // Retorna para a última quantidade selecionada nos chips
-                atualizarListaPorQuantidade(quantidadeSelecionada);
+                if (checkedId == R.id.btnFiltroQtd) {
+                    modoPeriodoAtivo = false;
+                    containerQuantidade.setVisibility(View.VISIBLE);
+                    containerPeriodo.setVisibility(View.GONE);
+                    atualizarListaPorQuantidade(quantidadeSelecionada);
+                } else if (checkedId == R.id.btnFiltroPeriodo) {
+                    modoPeriodoAtivo = true;
+                    containerQuantidade.setVisibility(View.GONE);
+                    containerPeriodo.setVisibility(View.VISIBLE);
+                    atualizarListaPorPeriodo(mesesSelecionados);
+                }
             }
-            buttonView.setText(tituloSwitch);
         });
 
-        // 3. Lógica dos Chips (Selecionar 10, 50 ou 100)
-        chipGroup.setOnCheckedChangeListener((group, checkedId) -> {
+        // 5. Lógica dos Chips de Quantidade
+        chipGroupQtd.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == View.NO_ID) return; // Evita ação caso o usuário desmarque o chip ativo
+
             if (checkedId == R.id.chip10) {
                 quantidadeSelecionada = 10;
             } else if (checkedId == R.id.chip50) {
@@ -107,30 +110,30 @@ public class Historic extends AppCompatActivity {
                 quantidadeSelecionada = 100;
             }
 
-            // Só atualiza se o modo período não estiver bloqueando a visão
             if (!modoPeriodoAtivo) {
                 atualizarListaPorQuantidade(quantidadeSelecionada);
             }
         });
 
-        // 4. Lógica do Botão Aplicar (Filtrar por meses digitados)
-        btnAplicarPeriodo.setOnClickListener(v -> {
-            processarFiltroPorPeriodo(editMeses.getText().toString());
+        // 6. Lógica dos Chips de Período (Novo fluxo reativo sem botão manual)
+        chipGroupPeriodo.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == View.NO_ID) return;
+
+            if (checkedId == R.id.chip3Meses) {
+                mesesSelecionados = 3;
+            } else if (checkedId == R.id.chip6Meses) {
+                mesesSelecionados = 6;
+            } else if (checkedId == R.id.chip1Ano) {
+                mesesSelecionados = 12; // 1 ano = 12 meses
+            }
+
+            if (modoPeriodoAtivo) {
+                atualizarListaPorPeriodo(mesesSelecionados);
+            }
         });
 
-        // 5. Carga Inicial: Modo Quantidade (10 registros)
+        // 7. Carga Inicial da Tela (Padrão: 10 últimos registros)
         atualizarListaPorQuantidade(quantidadeSelecionada);
-    }
-
-    private void processarFiltroPorPeriodo(String valor) {
-        if (!valor.isEmpty()) {
-            try {
-                int meses = Integer.parseInt(valor);
-                atualizarListaPorPeriodo(meses);
-            } catch (NumberFormatException e) {
-                Toast.makeText(this, "Digite um número válido", Toast.LENGTH_SHORT).show();
-            }
-        }
     }
 
     private void atualizarListaPorQuantidade(int limite) {
@@ -139,7 +142,6 @@ public class Historic extends AppCompatActivity {
         DataBase db = new DataBase(this);
         String nome = SessaoUsuario.getInstance().getUsuarioLogado().getNome();
 
-        // Busca registros (pegamos um número grande para garantir que o subList funcione)
         List<UserAtributos> listaTotal = db.getRegistriesByUser(nome, 999);
         List<UserAtributos> filtrada;
 
@@ -158,17 +160,13 @@ public class Historic extends AppCompatActivity {
         DataBase db = new DataBase(this);
         String nome = SessaoUsuario.getInstance().getUsuarioLogado().getNome();
 
-        // Usa a consulta SQL por período (meses retroativos)
         List<UserAtributos> lista = db.getRegistriesByPeriod(nome, meses);
-
         configurarTelaComLista(lista);
     }
 
     private void configurarTelaComLista(List<UserAtributos> lista) {
-        // Gráfico recebe a lista na ordem cronológica (ASC)
         gerarGrafico(lista);
 
-        // RecyclerView recebe a lista invertida (Mais novos no topo)
         List<UserAtributos> listaParaRecycler = new ArrayList<>(lista);
         Collections.reverse(listaParaRecycler);
 
@@ -179,7 +177,6 @@ public class Historic extends AppCompatActivity {
     }
 
     private void gerarGrafico(List<UserAtributos> listaImc) {
-        LineChart chart = findViewById(R.id.chartHistorico);
         if (listaImc == null || listaImc.isEmpty()) {
             chart.setNoDataText("Nenhum dado para este filtro.");
             chart.clear();
@@ -200,7 +197,7 @@ public class Historic extends AppCompatActivity {
 
         LineData lineData = new LineData(dataSet);
 
-        // Linha de Chegada (Ponto Verde fixo à direita)
+        // Linha de Chegada (Meta)
         UserAtributos user = SessaoUsuario.getInstance().getUsuarioLogado();
         if (user != null && user.getMetaIMC() > 0) {
             float imcMeta = (float) user.getMetaIMC();
@@ -236,7 +233,6 @@ public class Historic extends AppCompatActivity {
         left.setAxisMinimum(10f);
         left.setAxisMaximum(45f);
 
-        // Linhas de Referência
         addLimit(left, 18.6f, "Mínimo Ideal", "#90A4AE");
         addLimit(left, 25.0f, "Máximo Ideal", "#90A4AE");
         addLimit(left, 40.0f, "Alerta", "#EF5350");
@@ -258,10 +254,9 @@ public class Historic extends AppCompatActivity {
                 .setPositiveButton("Sim", (d, w) -> {
                     db.deletarRegistro(listaExibida.get(pos).getId());
 
-                    // Recarrega mantendo o modo que o usuário estava usando
+                    // Recarrega mantendo de forma limpa o estado atual do filtro
                     if (modoPeriodoAtivo) {
-                        EditText editMeses = findViewById(R.id.editMeses);
-                        processarFiltroPorPeriodo(editMeses.getText().toString());
+                        atualizarListaPorPeriodo(mesesSelecionados);
                     } else {
                         atualizarListaPorQuantidade(quantidadeSelecionada);
                     }

@@ -6,7 +6,7 @@
     android:inputType="numberDecimal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/vertical"
+    android:background="@drawable/bg_vertical_transparente"
     tools:context=".view.Resultados">
 
     <TextView

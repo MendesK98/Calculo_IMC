@@ -55,6 +55,13 @@ public class UserAtributos implements Serializable {
         }
     }
 
+    public String getClassificacao() {
+        if (this.imc.getIndice() < 18.5) return "Abaixo do peso";
+        if (this.imc.getIndice() < 25) return "Peso ideal";
+        if (this.imc.getIndice() < 30) return "Sobrepeso";
+        return "Obesidade";
+    }
+
     @Override
     public String toString() {
         return this.nome + " (Idade: " + this.idade + ")";

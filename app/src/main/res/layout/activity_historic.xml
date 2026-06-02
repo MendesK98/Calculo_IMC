@@ -4,69 +4,78 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5"
+    android:background="@drawable/bg_vertical_transparente"
     tools:context=".view.Historic">
 
-    <!-- 1. GRÁFICO (Topo da tela) -->
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/chartHistorico"
         android:layout_width="match_parent"
-        android:layout_height="250dp"
+        android:layout_height="220dp"
         android:layout_margin="16dp"
         android:background="@android:color/white"
-        android:elevation="4dp"
+        android:elevation="2dp"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- 2. CARD DE FILTROS (Dando profundidade e estilo) -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardFiltros"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
         app:cardCornerRadius="12dp"
-        app:cardElevation="4dp"
+        app:cardElevation="2dp"
         app:strokeWidth="0dp"
         app:layout_constraintTop_toBottomOf="@+id/chartHistorico">
 
         <LinearLayout
-            android:id="@+id/layoutFiltros"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- SWITCH ESTILIZADO -->
-            <com.google.android.material.materialswitch.MaterialSwitch
-                android:id="@+id/switchTipoFiltro"
-                style="@style/Widget.MaterialComponents.CompoundButton.Switch"
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/toggleGroupFiltro"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:text="Filtrar por Quantidade"
-                android:textColor="?attr/colorPrimary"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:showText="true"
-                android:textOn="Mês"
-                android:textOff="Qtd" />
+                app:checkedButton="@+id/btnFiltroQtd"
+                app:singleSelection="true"
+                app:selectionRequired="true">
 
-            <!-- CONTAINER QUANTIDADE (CHIPS) -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnFiltroQtd"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Por Quantidade" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnFiltroPeriodo"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Por Período" />
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
             <LinearLayout
                 android:id="@+id/containerQuantidade"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:visibility="visible">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
+                    android:layout_marginEnd="12dp"
                     android:text="Exibir últimos:"
                     android:textStyle="bold" />
 
                 <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/chipGroupFiltro"
+                    android:id="@+id/chipGroupQtd"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:selectionRequired="true"
@@ -74,7 +83,7 @@
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chip10"
-                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        style="@style/Widget.Material3.Chip.Filter"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:checked="true"
@@ -82,59 +91,69 @@
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chip50"
-                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        style="@style/Widget.Material3.Chip.Filter"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="50" />
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chip100"
-                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        style="@style/Widget.Material3.Chip.Filter"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="100" />
                 </com.google.android.material.chip.ChipGroup>
             </LinearLayout>
 
-            <!-- CONTAINER PERÍODO -->
             <LinearLayout
                 android:id="@+id/containerPeriodo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:visibility="gone">
+                android:visibility="gone"
+                tools:visibility="visible">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:text="Meses atrás:"
+                    android:layout_marginEnd="12dp"
+                    android:text="Período:"
                     android:textStyle="bold" />
 
-                <EditText
-                    android:id="@+id/editMeses"
-                    android:layout_width="70dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/abc_edit_text_material"
-                    android:gravity="center"
-                    android:inputType="number"
-                    android:text="3" />
-
-                <Button
-                    android:id="@+id/btnAplicarPeriodo"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chipGroupPeriodo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="Filtrar"
-                    android:textAllCaps="true"
-                    android:textStyle="bold" />
+                    app:selectionRequired="true"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip3Meses"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="3 meses" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip6Meses"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="6 meses" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip1Ano"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="1 ano" />
+                </com.google.android.material.chip.ChipGroup>
             </LinearLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- 3. LISTA DE REGISTROS -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewHistorico"
         android:layout_width="match_parent"
