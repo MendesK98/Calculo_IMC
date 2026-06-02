@@ -19,7 +19,6 @@
         android:background="#41000000"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:alpha="0.85"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -42,19 +41,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Métrico (kg/m)"
-            android:textColor="@color/black"
-            app:strokeColor="#40000000" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnImperial"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Imperial (lb/in)"
-            android:textColor="@color/black"
-            app:strokeColor="#40000000" />
-
-    </com.google.android.material.button.MaterialButtonToggleGroup>
+            android:textColor="@color/white"
+            app:strokeColor="#40FFFFFF" /> <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnImperial"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Imperial (lb/in)"
+        android:textColor="@color/white"
+        app:strokeColor="#40FFFFFF" /> </com.google.android.material.button.MaterialButtonToggleGroup>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/txtInputPeso"
@@ -62,8 +57,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
-        android:textColorHint="@color/black"
-        app:hintTextColor="@color/black"
+        android:textColorHint="@color/white"
+        app:hintTextColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toggleGroup"
@@ -79,7 +74,7 @@
             android:layout_height="wrap_content"
             android:hint="Digite seu peso"
             android:inputType="numberDecimal"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:background="@android:color/transparent"/>
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -89,8 +84,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:textColorHint="@color/black"
-        app:hintTextColor="@color/black"
+        android:textColorHint="@color/white"
+        app:hintTextColor="@color/white"
         app:layout_constraintEnd_toEndOf="@+id/txtInputPeso"
         app:layout_constraintStart_toStartOf="@+id/txtInputPeso"
         app:layout_constraintTop_toBottomOf="@+id/txtInputPeso"
@@ -105,7 +100,7 @@
             android:layout_height="wrap_content"
             android:hint="Digite sua altura"
             android:inputType="numberDecimal"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:background="@android:color/transparent"/>
     </com.google.android.material.textfield.TextInputLayout>
 
