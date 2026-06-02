@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/vertical"
+    android:background="@drawable/bg_vertical_transparente"
     android:padding="24dp"
     tools:context=".view.ReceberDados">
 
@@ -12,14 +12,14 @@
         android:id="@+id/textView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="80dp"
-        android:background="#80000000"
-        android:padding="12dp"
-        android:text="Informe seus atributos abaixo:"
+        android:layout_marginTop="64dp"
+        android:text="Informe seus atributos abaixo"
         android:textAlignment="center"
-        android:textColor="@color/white"
-        android:textSize="22sp"
+        android:textColor="#FFFFFF"
+        android:background="#41000000"
+        android:textSize="24sp"
         android:textStyle="bold"
+        android:alpha="0.85"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -36,39 +36,42 @@
         app:selectionRequired="true"
         app:singleSelection="true">
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnMetrico"
-            style="?attr/materialButtonOutlinedStyle"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Métrico (kg/m)"
-            android:textColor="@color/white"
-            app:strokeColor="@color/white" />
+            android:textColor="@color/black"
+            app:strokeColor="#40000000" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnImperial"
-            style="?attr/materialButtonOutlinedStyle"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Imperial (lb/in)"
-            android:textColor="@color/white"
-            app:strokeColor="@color/white" />
+            android:textColor="@color/black"
+            app:strokeColor="#40000000" />
 
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/txtInputPeso"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:textColorHint="@color/white"
-        app:boxStrokeColor="@color/white"
-        app:hintTextColor="@color/white"
+        android:layout_marginTop="40dp"
+        android:textColorHint="@color/black"
+        app:hintTextColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toggleGroup"
-        app:layout_constraintWidth_percent="0.8">
+        app:layout_constraintWidth_percent="0.85"
+        app:boxBackgroundColor="@android:color/transparent"
+        app:boxStrokeWidth="0dp"
+        app:boxStrokeWidthFocused="0dp"
+        android:background="@drawable/bg_input_vidro">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/tPeso"
@@ -76,22 +79,25 @@
             android:layout_height="wrap_content"
             android:hint="Digite seu peso"
             android:inputType="numberDecimal"
-            android:textColor="@color/white" />
+            android:textColor="@color/black"
+            android:background="@android:color/transparent"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/txtInputAltura"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:textColorHint="@color/white"
-        app:boxStrokeColor="@color/white"
-        app:hintTextColor="@color/white"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:textColorHint="@color/black"
+        app:hintTextColor="@color/black"
+        app:layout_constraintEnd_toEndOf="@+id/txtInputPeso"
+        app:layout_constraintStart_toStartOf="@+id/txtInputPeso"
         app:layout_constraintTop_toBottomOf="@+id/txtInputPeso"
-        app:layout_constraintWidth_percent="0.8">
+        app:boxBackgroundColor="@android:color/transparent"
+        app:boxStrokeWidth="0dp"
+        app:boxStrokeWidthFocused="0dp"
+        android:background="@drawable/bg_input_vidro">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/tAltura"
@@ -99,16 +105,22 @@
             android:layout_height="wrap_content"
             android:hint="Digite sua altura"
             android:inputType="numberDecimal"
-            android:textColor="@color/white" />
+            android:textColor="@color/black"
+            android:background="@android:color/transparent"/>
     </com.google.android.material.textfield.TextInputLayout>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btCalcular"
+        style="@style/Widget.MaterialComponents.Button"
         android:layout_width="0dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="40dp"
+        android:layout_height="56dp"
+        android:layout_marginTop="48dp"
         android:text="Calcular IMC"
-        android:textSize="18sp"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        app:backgroundTint="@color/black"
+        app:cornerRadius="14dp"
         app:layout_constraintEnd_toEndOf="@+id/txtInputAltura"
         app:layout_constraintStart_toStartOf="@+id/txtInputAltura"
         app:layout_constraintTop_toBottomOf="@+id/txtInputAltura" />
